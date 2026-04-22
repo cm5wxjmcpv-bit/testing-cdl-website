@@ -1,0 +1,552 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CDL Training Portal - Public Resources</title>
+
+  <style>
+    :root{
+      --navy:#17324d;
+      --navy-dark:#10263a;
+      --green:#2f8f4e;
+      --bg:#eef2f6;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#5b6570;
+      --border:#d8e0e8;
+      --shadow:0 12px 32px rgba(16,38,58,.12);
+      --radius:18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: linear-gradient(180deg, #f5f7fa 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .topbar{
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+      border-bottom: 4px solid var(--green);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(0,0,0,.14);
+    }
+
+    .topbar-inner{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-width:0;
+    }
+
+    .brand-logo{
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .brand-fallback{
+      font-size: 28px;
+      font-weight: 800;
+      color:#fff;
+      line-height:1;
+    }
+
+    .brand-text h1{
+      margin:0;
+      font-size: clamp(1.35rem, 2vw, 2rem);
+      line-height:1.1;
+      letter-spacing:.02em;
+    }
+
+    .brand-text p{
+      margin:4px 0 0;
+      color: rgba(255,255,255,.86);
+      font-size: .98rem;
+      font-weight: 500;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .top-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      transition:background .15s ease, border-color .15s ease, transform .08s ease;
+    }
+
+    .top-link:hover{
+      background: rgba(255,255,255,.16);
+      border-color: rgba(255,255,255,.30);
+    }
+
+    .top-link:active{
+      transform:translateY(1px);
+    }
+
+    .page{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 34px 20px 48px;
+    }
+
+    .hero{
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(23,50,77,.06);
+      padding: 34px;
+      position:relative;
+      overflow:hidden;
+      margin-bottom:28px;
+      isolation:isolate;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-70px;
+      bottom:-70px;
+      width: 300px;
+      height: 300px;
+      background: url("logo.png") no-repeat center/contain;
+      opacity:.05;
+      pointer-events:none;
+      z-index:-1;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#e7eef5;
+      color:var(--navy);
+      font-size:.86rem;
+      font-weight:800;
+      margin-bottom:18px;
+    }
+
+    .hero h2{
+      margin:0 0 12px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+      color: var(--navy-dark);
+    }
+
+    .accent{
+      width: 88px;
+      height: 4px;
+      border-radius:999px;
+      background: var(--green);
+      margin: 0 0 18px;
+    }
+
+    .hero p{
+      margin:0;
+      max-width:720px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .hero-points{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .hero-point{
+      background:#f7fafc;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:16px;
+      box-shadow:0 8px 18px rgba(16,38,58,.05);
+    }
+
+    .hero-point strong{
+      display:block;
+      color:var(--navy-dark);
+      margin-bottom:6px;
+      font-size:1rem;
+    }
+
+    .hero-point span{
+      color:var(--muted);
+      line-height:1.55;
+      font-size:.95rem;
+    }
+
+    .section{
+      margin-top: 30px;
+    }
+
+    .section-header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+
+    .section-header h3{
+      margin:0;
+      font-size:1.45rem;
+      color:var(--navy-dark);
+    }
+
+    .section-header p{
+      margin:6px 0 0;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 20px;
+    }
+
+    .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(23,50,77,.06);
+      padding: 24px;
+    }
+
+    .card h4{
+      margin:0 0 10px;
+      font-size:1.25rem;
+      color:var(--navy-dark);
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+      margin-bottom:18px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#eef4f8;
+      color:var(--navy);
+      font-weight:800;
+      font-size:.85rem;
+      border:1px solid #dbe6ef;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:8px;
+    }
+
+    .btn,
+    .btn-secondary{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+      padding:12px 16px;
+      border-radius:12px;
+      text-decoration:none;
+      font-weight:800;
+      transition:transform .08s ease, opacity .15s ease, background .15s ease, border-color .15s ease;
+      cursor:pointer;
+    }
+
+    .btn{
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+      color:#fff;
+      border:0;
+      box-shadow:0 10px 20px rgba(16,38,58,.18);
+    }
+
+    .btn-secondary{
+      background:#fff;
+      color:var(--navy-dark);
+      border:1px solid var(--border);
+      box-shadow:0 8px 18px rgba(16,38,58,.08);
+    }
+
+    .btn:hover,
+    .btn-secondary:hover{
+      opacity:.97;
+    }
+
+    .btn:active,
+    .btn-secondary:active{
+      transform:translateY(1px);
+    }
+
+    .info-box{
+      margin-top:20px;
+      padding:18px;
+      border-radius:14px;
+      background:#f7fafc;
+      border:1px solid var(--border);
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .video-card{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-height: 220px;
+      justify-content:center;
+      text-align:left;
+    }
+
+    .video-placeholder{
+      border:2px dashed #c9d6e2;
+      border-radius:14px;
+      background:#f9fbfc;
+      padding:20px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .footer{
+      max-width:1120px;
+      margin:0 auto;
+      padding: 0 20px 30px;
+      color: var(--muted);
+      font-size:.92rem;
+    }
+
+    @media (max-width: 900px){
+      .hero-points{
+        grid-template-columns: 1fr;
+      }
+      .grid{
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px){
+      .brand-logo{
+        width:52px;
+        height:52px;
+      }
+      .hero,
+      .card{
+        padding:22px;
+      }
+      .top-link,
+      .btn,
+      .btn-secondary{
+        width:100%;
+      }
+      .actions,
+      .top-actions{
+        flex-direction:column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <div class="brand-logo">
+          <img
+            src="logo.png"
+            alt="Martinsville CDL Program logo"
+            onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;brand-fallback&quot;>M</div>';">
+        </div>
+        <div class="brand-text">
+          <h1>Martinsville CDL Program</h1>
+          <p>Public CDL Study Resources</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <a class="top-link" href="index.html">Back to Login</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">Public Resources</span>
+      <h2>Pre-trip study materials available before login.</h2>
+      <div class="accent"></div>
+      <p>
+        Use these public resources to review pre-trip material before class or before entering the
+        training portal. Study guides can be opened online or downloaded for offline use.
+      </p>
+
+      <div class="hero-points">
+        <div class="hero-point">
+          <strong>View online</strong>
+          <span>Open study guides in a browser-based document viewer.</span>
+        </div>
+        <div class="hero-point">
+          <strong>Download anytime</strong>
+          <span>Save guides to your phone, tablet, or computer for later review.</span>
+        </div>
+        <div class="hero-point">
+          <strong>Built to grow</strong>
+          <span>This page is ready for pre-trip videos and added training resources.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h3>Pre-Trip Study Guides</h3>
+          <p>Open the guide online or download a copy for offline study.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <h4>Class A Pre-Trip Study Guide</h4>
+          <p>
+            Public study material covering Class A pre-trip inspection content, including light checks,
+            engine compartment items, steering axle inspection, brake checks, and combination vehicle
+            components. The uploaded guide is titled “The City Of Martinsville Class A Pre-trip study guide.” 
+          </p>
+
+          <div class="meta">
+            <span class="pill">Class A</span>
+            <span class="pill">DOCX Format</span>
+            <span class="pill">Download or View</span>
+          </div>
+
+          <div class="actions">
+            <button class="btn" type="button" onclick="openDocViewer('2024 CDL pre trip(3).docx')">View Online</button>
+            <a class="btn-secondary" href="2024 CDL pre trip(3).docx" download>Download Guide</a>
+            <a class="btn-secondary" href="2024 CDL pre trip(3).docx" target="_blank" rel="noopener">Open File Direct</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h4>Class B Pre-Trip Study Guide</h4>
+          <p>
+            Public study material covering Class B pre-trip inspection content, including light checks,
+            fluid and air leaks, steering and suspension items, internal inspection, and service brake tests.
+            The uploaded guide is titled “The City Of Martinsville Class B Pre-trip study guide.”
+          </p>
+
+          <div class="meta">
+            <span class="pill">Class B</span>
+            <span class="pill">DOCX Format</span>
+            <span class="pill">Download or View</span>
+          </div>
+
+          <div class="actions">
+            <button class="btn" type="button" onclick="openDocViewer('Class B pre trip study guide 2025(3).docx')">View Online</button>
+            <a class="btn-secondary" href="Class B pre trip study guide 2025(3).docx" download>Download Guide</a>
+            <a class="btn-secondary" href="Class B pre trip study guide 2025(3).docx" target="_blank" rel="noopener">Open File Direct</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="info-box">
+        If the online viewer does not open on a device, use <strong>Download Guide</strong> or
+        <strong>Open File Direct</strong>. DOCX browser support can vary by device and browser.
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h3>Pre-Trip Videos</h3>
+          <p>This section is ready for your public pre-trip video links when you want to add them.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card video-card">
+          <h4>Class A Pre-Trip Video</h4>
+          <div class="video-placeholder">
+            Add your public YouTube Class A pre-trip video here later.
+            <br><br>
+            When you are ready, I can give you a second safe update that adds the embed without changing the rest of this page.
+          </div>
+        </article>
+
+        <article class="card video-card">
+          <h4>Class B Pre-Trip Video</h4>
+          <div class="video-placeholder">
+            Add your public YouTube Class B pre-trip video here later.
+            <br><br>
+            This keeps the page live now without risking broken embeds.
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">
+    Martinsville CDL Program · Public CDL Study Resources
+  </div>
+
+  <script>
+    function openDocViewer(filename) {
+      const publicUrl = new URL(filename, window.location.href).href;
+      const viewerUrl = "https://view.officeapps.live.com/op/view.aspx?src=" + encodeURIComponent(publicUrl);
+      window.open(viewerUrl, "_blank", "noopener");
+    }
+  </script>
+
+</body>
+</html>

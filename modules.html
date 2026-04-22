@@ -1,0 +1,774 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Martinsville CDL Program - Modules</title>
+  <script src="config.js" defer></script>
+  <script src="frontend-api.js" defer></script>
+  <style>
+    :root{
+      --navy:#17324d;
+      --navy-dark:#10263a;
+      --green:#2f8f4e;
+      --green-soft:#e8f5ec;
+      --gray:#667085;
+      --gray-soft:#f3f4f6;
+      --bg:#eef2f6;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#5b6570;
+      --border:#d8e0e8;
+      --shadow:0 10px 30px rgba(16,38,58,.10);
+      --radius:18px;
+    }
+
+    * { box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family:Inter, system-ui, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      background:linear-gradient(135deg,var(--navy-dark),var(--navy));
+      color:#fff;
+      border-bottom:4px solid var(--green);
+      box-shadow:0 4px 18px rgba(0,0,0,.14);
+    }
+
+    .topbar-inner{
+      max-width:1120px;
+      margin:0 auto;
+      padding:18px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .brand-wrap{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-width:0;
+    }
+
+    .brand-logo{
+      width:60px;
+      height:60px;
+      border-radius:14px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .brand-fallback{
+      font-size:28px;
+      font-weight:800;
+      color:#fff;
+      line-height:1;
+    }
+
+    .brand-text h1{
+      margin:0;
+      font-size:clamp(1.3rem,2vw,1.95rem);
+      line-height:1.1;
+    }
+
+    .brand-text p{
+      margin:4px 0 0;
+      color:rgba(255,255,255,.86);
+      font-weight:500;
+    }
+
+    .btn{
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      border-radius:12px;
+      padding:11px 14px;
+      font-weight:800;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .btn:hover{ background:rgba(255,255,255,.16); }
+
+    .page{
+      max-width:1120px;
+      margin:0 auto;
+      padding:28px 20px 42px;
+    }
+
+    .hero{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(23,50,77,.06);
+      padding:26px;
+      position:relative;
+      overflow:hidden;
+      margin-bottom:22px;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-70px;
+      bottom:-70px;
+      width:340px;
+      height:340px;
+      background:url("logo.png") no-repeat center/contain;
+      opacity:.05;
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      background:#e8eef5;
+      color:var(--navy);
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:.86rem;
+      font-weight:800;
+      margin-bottom:12px;
+    }
+
+    .hero h2{
+      margin:0;
+      font-size:clamp(1.8rem,3vw,2.6rem);
+      color:var(--navy-dark);
+    }
+
+    .accent{
+      width:90px;
+      height:4px;
+      background:var(--green);
+      border-radius:999px;
+      margin:12px 0 16px;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      max-width:700px;
+      line-height:1.6;
+    }
+
+    .small{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .who{
+      margin-top:14px;
+      color:var(--navy-dark);
+      font-weight:700;
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr .8fr .8fr;
+      gap:16px;
+      margin-bottom:22px;
+    }
+
+    .summary-card{
+      background:var(--card);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(23,50,77,.06);
+      padding:20px;
+    }
+
+    .summary-title{
+      margin:0 0 8px;
+      font-size:.95rem;
+      color:var(--muted);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .progress-value,
+    .summary-value{
+      font-size:2rem;
+      line-height:1;
+      font-weight:900;
+      color:var(--navy-dark);
+    }
+
+    .progress-value{
+      margin-bottom:12px;
+    }
+
+    .progress-bar{
+      width:100%;
+      height:12px;
+      border-radius:999px;
+      background:#e5ebf1;
+      overflow:hidden;
+      margin-bottom:10px;
+    }
+
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--green),#54b36f);
+      border-radius:999px;
+      transition:width .2s ease;
+    }
+
+    .progress-loading{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+      color:var(--muted);
+      font-weight:700;
+      min-height:38px;
+    }
+
+    .spinner{
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:2px solid rgba(23,50,77,.16);
+      border-top-color:var(--navy);
+      animation:spin .8s linear infinite;
+      flex:0 0 auto;
+    }
+
+    .loading-hidden{
+      display:none !important;
+    }
+
+    .section-title{
+      margin:0 0 14px;
+      color:var(--navy-dark);
+      font-size:1.35rem;
+    }
+
+    .modules-grid{
+      display:grid;
+      gap:16px;
+    }
+
+    .module-card{
+      background:var(--card);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(23,50,77,.06);
+      padding:20px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:18px;
+      align-items:center;
+    }
+
+    .module-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .module-title{
+      margin:0;
+      color:var(--navy-dark);
+      font-size:1.2rem;
+    }
+
+    .module-meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .meta-pill{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      color:var(--muted);
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:.9rem;
+      font-weight:700;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:7px 11px;
+      font-size:.88rem;
+      font-weight:800;
+      white-space:nowrap;
+      border:1px solid transparent;
+    }
+
+    .badge-complete{
+      background:var(--green-soft);
+      color:var(--green);
+      border-color:rgba(47,143,78,.25);
+    }
+
+    .badge-not{
+      background:var(--gray-soft);
+      color:var(--gray);
+      border-color:#d5d9df;
+    }
+
+    .badge-loading{
+      background:#eef2f6;
+      color:#64748b;
+      border-color:#d8e0e8;
+    }
+
+    .module-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .open-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:120px;
+      text-decoration:none;
+      border-radius:12px;
+      padding:12px 16px;
+      background:linear-gradient(135deg,var(--navy-dark),var(--navy));
+      color:#fff;
+      font-weight:800;
+      box-shadow:0 10px 18px rgba(16,38,58,.14);
+    }
+
+    .open-btn:hover{ opacity:.96; }
+
+    .test-card{
+      margin-top:18px;
+      background:var(--card);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(23,50,77,.06);
+      padding:20px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:18px;
+      align-items:center;
+    }
+
+    .locked-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:120px;
+      border-radius:12px;
+      padding:12px 16px;
+      background:#e5e7eb;
+      color:#6b7280;
+      font-weight:800;
+      cursor:not-allowed;
+    }
+
+    .footer{
+      padding-top:26px;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    @keyframes spin{
+      to{ transform:rotate(360deg); }
+    }
+
+    @media (max-width: 920px){
+      .summary-grid{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px){
+      .module-card,
+      .test-card{
+        grid-template-columns:1fr;
+      }
+      .module-actions{
+        justify-content:flex-start;
+      }
+    }
+
+    @media (max-width: 560px){
+      .summary-grid{
+        grid-template-columns:1fr;
+      }
+      .hero,
+      .summary-card,
+      .module-card,
+      .test-card{
+        padding:18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-wrap">
+        <div class="brand-logo">
+          <img
+            src="logo.png"
+            alt="Martinsville CDL Program logo"
+            onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;brand-fallback&quot;>M</div>';">
+        </div>
+        <div class="brand-text">
+          <h1>Martinsville CDL Program</h1>
+          <p>ELDT Compliance Training</p>
+        </div>
+      </div>
+
+      <button class="btn" onclick="logout()">Log out</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Training Dashboard</div>
+      <h2>Your assigned modules</h2>
+      <div class="accent"></div>
+      <p>
+        Review your required training modules and track completion progress through the
+        Martinsville CDL Program.
+      </p>
+      <div class="who" id="who"></div>
+      <div id="status" class="small" style="margin-top:6px;">Loading modules…</div>
+    </section>
+
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-title">Overall Progress</div>
+
+        <div id="progressLoading" class="progress-loading">
+          <span class="spinner"></span>
+          <span>Loading progress from Google Sheets…</span>
+        </div>
+
+        <div id="progressContent">
+          <div class="progress-value" id="progressValue">0%</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="small" id="progressNote">0 of 10 modules completed</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-title">Completed</div>
+        <div class="summary-value" id="completedCount">0</div>
+        <div class="small" style="margin-top:8px;">Finished modules</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-title">Remaining</div>
+        <div class="summary-value" id="remainingCount">0</div>
+        <div class="small" style="margin-top:8px;">Modules left to complete</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-title">Required Watch</div>
+        <div class="summary-value">90%</div>
+        <div class="small" style="margin-top:8px;">Minimum viewing threshold per module</div>
+      </div>
+    </section>
+
+    <section>
+      <h3 class="section-title">Modules</h3>
+      <div class="modules-grid" id="list"></div>
+    </section>
+
+    <section>
+      <h3 class="section-title" style="margin-top:24px;">Final Test</h3>
+      <div class="test-card">
+        <div>
+          <div class="module-top" style="margin-bottom:10px;">
+            <h4 class="module-title" style="margin:0;">Knowledge Test</h4>
+            <span id="testBadge" class="badge badge-not">Locked</span>
+          </div>
+          <div class="small">The test unlocks after all modules are complete.</div>
+          <div id="testInfo" class="small" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="module-actions">
+          <span id="testLockedBtn" class="locked-btn">Locked</span>
+          <a id="testOpenBtn" class="open-btn" href="test.html" style="display:none;">Take Test</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Martinsville CDL Program · ELDT Compliance Training
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const username = requireAuth();
+    document.getElementById("who").textContent = `Signed in as ${username}`;
+
+    const list = document.getElementById("list");
+    const statusEl = document.getElementById("status");
+    const progressValue = document.getElementById("progressValue");
+    const progressFill = document.getElementById("progressFill");
+    const progressNote = document.getElementById("progressNote");
+    const completedCount = document.getElementById("completedCount");
+    const remainingCount = document.getElementById("remainingCount");
+    const testBadge = document.getElementById("testBadge");
+    const testInfo = document.getElementById("testInfo");
+    const testLockedBtn = document.getElementById("testLockedBtn");
+    const testOpenBtn = document.getElementById("testOpenBtn");
+    const progressLoading = document.getElementById("progressLoading");
+    const progressContent = document.getElementById("progressContent");
+
+    const CACHE_KEY = "cdl_status_" + username;
+
+    function makeEmptyStatus() {
+      const modules = {};
+      MODULES.forEach(m => {
+        modules["m" + m.id] = false;
+      });
+
+      return {
+        ok: true,
+        username,
+        modules,
+        testComplete: false,
+        testScore: ""
+      };
+    }
+
+    function normalizeStatus(status) {
+      const base = makeEmptyStatus();
+
+      if (!status || typeof status !== "object") {
+        return base;
+      }
+
+      const normalized = {
+        ok: status.ok !== false,
+        username: status.username || username,
+        modules: { ...base.modules },
+        testComplete: !!status.testComplete,
+        testScore: status.testScore ?? ""
+      };
+
+      if (status.modules && typeof status.modules === "object") {
+        MODULES.forEach(m => {
+          normalized.modules["m" + m.id] = !!status.modules["m" + m.id];
+        });
+      }
+
+      return normalized;
+    }
+
+    function safeReadCache() {
+      try {
+        const raw = sessionStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        return normalizeStatus(JSON.parse(raw));
+      } catch {
+        return null;
+      }
+    }
+
+    function safeWriteCache(status) {
+      try {
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify(normalizeStatus(status)));
+      } catch {}
+    }
+
+    function allModulesDone(status) {
+      return MODULES.every(m => !!status.modules["m" + m.id]);
+    }
+
+    function showProgressLoading(show) {
+      progressLoading.classList.toggle("loading-hidden", !show);
+      progressContent.classList.toggle("loading-hidden", show);
+    }
+
+    function render(status, sourceText) {
+      const safeStatus = normalizeStatus(status);
+      list.innerHTML = "";
+
+      let completed = 0;
+
+      MODULES.forEach(m => {
+        const done = !!safeStatus.modules["m" + m.id];
+        if (done) completed++;
+
+        const card = document.createElement("div");
+        card.className = "module-card";
+        card.innerHTML = `
+          <div>
+            <div class="module-top">
+              <h4 class="module-title">${m.title}</h4>
+              <span class="badge ${done ? "badge-complete" : "badge-not"}">
+                ${done ? "Complete" : "Not Complete"}
+              </span>
+            </div>
+            <div class="small">Video module</div>
+            <div class="module-meta">
+              <span class="meta-pill">Module ${m.id}</span>
+              <span class="meta-pill">90% required</span>
+            </div>
+          </div>
+          <div class="module-actions">
+            <a class="open-btn" href="player.html?m=${m.id}">${done ? "Review Module" : "Open Module"}</a>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      const total = MODULES.length;
+      const remaining = Math.max(total - completed, 0);
+      const percent = total ? Math.round((completed / total) * 100) : 0;
+
+      completedCount.textContent = completed;
+      remainingCount.textContent = remaining;
+      progressValue.textContent = percent + "%";
+      progressFill.style.width = percent + "%";
+      progressNote.textContent = `${completed} of ${total} modules completed`;
+
+      const unlocked = allModulesDone(safeStatus);
+
+      if (unlocked) {
+        testBadge.className = "badge badge-complete";
+        testBadge.textContent = safeStatus.testComplete ? "Complete" : "Unlocked";
+        testLockedBtn.style.display = "none";
+        testOpenBtn.style.display = "inline-flex";
+      } else {
+        testBadge.className = "badge badge-not";
+        testBadge.textContent = "Locked";
+        testLockedBtn.style.display = "inline-flex";
+        testOpenBtn.style.display = "none";
+      }
+
+      testInfo.textContent = safeStatus.testComplete
+        ? `Test complete. Score: ${safeStatus.testScore}`
+        : (unlocked ? "Unlocked." : "Locked.");
+
+      if (sourceText) {
+        statusEl.textContent = sourceText;
+      }
+
+      showProgressLoading(false);
+    }
+
+    function renderLoadingShell() {
+      list.innerHTML = "";
+
+      MODULES.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "module-card";
+        card.innerHTML = `
+          <div>
+            <div class="module-top">
+              <h4 class="module-title">${m.title}</h4>
+              <span class="badge badge-loading">Loading</span>
+            </div>
+            <div class="small">Video module</div>
+            <div class="module-meta">
+              <span class="meta-pill">Module ${m.id}</span>
+              <span class="meta-pill">90% required</span>
+            </div>
+          </div>
+          <div class="module-actions">
+            <a class="open-btn" href="player.html?m=${m.id}">Open Module</a>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      completedCount.textContent = "0";
+      remainingCount.textContent = String(MODULES.length);
+      progressValue.textContent = "0%";
+      progressFill.style.width = "0%";
+      progressNote.textContent = `0 of ${MODULES.length} modules completed`;
+
+      testBadge.className = "badge badge-not";
+      testBadge.textContent = "Locked";
+      testLockedBtn.style.display = "inline-flex";
+      testOpenBtn.style.display = "none";
+      testInfo.textContent = "Checking status…";
+
+      showProgressLoading(true);
+    }
+
+    async function loadFreshStatus() {
+      try {
+        const status = await apiGetStatus(username);
+
+        if (!status || !status.ok) {
+          statusEl.textContent = "Error loading status: " + ((status && status.error) || "Unknown");
+          showProgressLoading(false);
+          return;
+        }
+
+        const normalized = normalizeStatus(status);
+        safeWriteCache(normalized);
+        render(normalized, "Status loaded from Google Sheets.");
+      } catch (err) {
+        console.error(err);
+
+        const cached = safeReadCache();
+        if (cached) {
+          render(cached, "Showing saved status. Live refresh failed.");
+        } else {
+          statusEl.textContent = "Error loading status.";
+          showProgressLoading(false);
+        }
+      }
+    }
+
+    (function init() {
+      renderLoadingShell();
+
+      const cached = safeReadCache();
+
+      if (cached) {
+        render(cached, "Showing saved status. Refreshing from Google Sheets…");
+      } else {
+        statusEl.textContent = "Loading live status from Google Sheets…";
+        showProgressLoading(true);
+      }
+
+      loadFreshStatus();
+    })();
+    });
+  </script>
+</body>
+</html>

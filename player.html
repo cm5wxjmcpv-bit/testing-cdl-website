@@ -1,0 +1,763 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Martinsville CDL Program - Player</title>
+  <script src="config.js" defer></script>
+  <script src="frontend-api.js" defer></script>
+  <style>
+    :root{
+      --navy:#17324d;
+      --navy-dark:#10263a;
+      --green:#2f8f4e;
+      --bg:#eef2f6;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#5b6570;
+      --border:#d8e0e8;
+      --shadow:0 10px 30px rgba(16,38,58,.10);
+      --radius:18px;
+    }
+
+    * { box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family:Inter, system-ui, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      background:linear-gradient(135deg,var(--navy-dark),var(--navy));
+      color:#fff;
+      border-bottom:4px solid var(--green);
+      box-shadow:0 4px 18px rgba(0,0,0,.14);
+    }
+
+    .topbar-inner{
+      max-width:1120px;
+      margin:0 auto;
+      padding:18px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .brand-wrap{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-width:0;
+    }
+
+    .brand-logo{
+      width:60px;
+      height:60px;
+      border-radius:14px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .brand-fallback{
+      font-size:28px;
+      font-weight:800;
+      color:#fff;
+      line-height:1;
+    }
+
+    .brand-text h1{
+      margin:0;
+      font-size:clamp(1.25rem,2vw,1.9rem);
+      line-height:1.1;
+    }
+
+    .brand-text p{
+      margin:4px 0 0;
+      color:rgba(255,255,255,.86);
+      font-weight:500;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .btn,
+    .btn-link{
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      border-radius:12px;
+      padding:11px 14px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+      font-size:14px;
+    }
+
+    .btn:hover,
+    .btn-link:hover{ background:rgba(255,255,255,.16); }
+
+    .page{
+      max-width:1120px;
+      margin:0 auto;
+      padding:28px 20px 42px;
+    }
+
+    .hero{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(23,50,77,.06);
+      padding:24px;
+      margin-bottom:22px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-50px;
+      bottom:-50px;
+      width:280px;
+      height:280px;
+      background:url("logo.png") no-repeat center/contain;
+      opacity:.05;
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      background:#e8eef5;
+      color:var(--navy);
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:.86rem;
+      font-weight:800;
+      margin-bottom:12px;
+    }
+
+    .hero h2{
+      margin:0;
+      font-size:clamp(1.7rem,3vw,2.5rem);
+      color:var(--navy-dark);
+    }
+
+    .accent{
+      width:90px;
+      height:4px;
+      background:var(--green);
+      border-radius:999px;
+      margin:12px 0 14px;
+    }
+
+    .small{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .meta-row{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .meta-pill{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      color:var(--muted);
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:.9rem;
+      font-weight:700;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 300px;
+      gap:20px;
+      align-items:start;
+    }
+
+    .video-card,
+    .side-card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(23,50,77,.06);
+      overflow:hidden;
+    }
+
+    .video-shell{
+      padding:20px;
+    }
+
+    .crop{
+      position:relative;
+      width:100%;
+      aspect-ratio:16 / 9;
+      overflow:hidden;
+      border-radius:16px;
+      background:#000;
+      border:1px solid #d9dfe6;
+    }
+
+    #player{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+    }
+
+    .player-footer{
+      margin-top:16px;
+    }
+
+    .progress-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+
+    .progress-label{
+      font-weight:800;
+      color:var(--navy-dark);
+    }
+
+    .progress-text{
+      font-weight:800;
+      color:var(--muted);
+    }
+
+    .progress-bar{
+      width:100%;
+      height:14px;
+      border-radius:999px;
+      background:#e5ebf1;
+      overflow:hidden;
+    }
+
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--green),#54b36f);
+      border-radius:999px;
+    }
+
+    .notice{
+      margin-top:12px;
+      padding:14px 16px;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:14px;
+    }
+
+    .side-card{
+      padding:20px;
+    }
+
+    .side-card h3{
+      margin:0;
+      color:var(--navy-dark);
+      font-size:1.1rem;
+    }
+
+    .side-card .accent{
+      width:72px;
+      margin:12px 0 14px;
+    }
+
+    .info-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .info-item{
+      padding:12px 14px;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      border-radius:14px;
+    }
+
+    .info-item strong{
+      display:block;
+      color:var(--navy-dark);
+      margin-bottom:4px;
+    }
+
+    .info-item span{
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    @media (max-width: 960px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 560px){
+      .hero,
+      .video-shell,
+      .side-card{
+        padding:18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-wrap">
+        <div class="brand-logo">
+          <img
+            src="logo.png"
+            alt="Martinsville CDL Program logo"
+            onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;brand-fallback&quot;>M</div>';">
+        </div>
+        <div class="brand-text">
+          <h1>Martinsville CDL Program</h1>
+          <p>ELDT Compliance Training</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <a class="btn-link" href="modules.html">Back to Modules</a>
+        <button class="btn" onclick="logout()">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Course Player</div>
+      <h2 id="title">Module</h2>
+      <div class="accent"></div>
+      <div class="small" id="who"></div>
+
+      <div class="meta-row">
+        <span class="meta-pill" id="modulePill">Module</span>
+        <span class="meta-pill">Required watch: 90%</span>
+        <span class="meta-pill">Completion logged automatically</span>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="video-card">
+        <div class="video-shell">
+          <div class="crop">
+            <div id="player"></div>
+          </div>
+
+          <div class="player-footer">
+            <div class="progress-head">
+              <div class="progress-label">Viewing Progress</div>
+              <div class="progress-text" id="progress">Loading…</div>
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="notice">
+              <div id="done" class="small"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side-card">
+        <h3>Module Information</h3>
+        <div class="accent"></div>
+
+        <div class="info-list">
+          <div class="info-item">
+            <strong>Training Program</strong>
+            <span>Martinsville CDL Program</span>
+          </div>
+
+          <div class="info-item">
+            <strong>Type</strong>
+            <span>Video Module</span>
+          </div>
+
+          <div class="info-item">
+            <strong>Completion Rule</strong>
+            <span id="ruleText">90% minimum viewing threshold</span>
+          </div>
+
+          <div class="info-item">
+            <strong>Status</strong>
+            <span id="statusText">In Progress</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const username = requireAuth();
+    document.getElementById("who").textContent = `Signed in as ${username}`;
+
+    const moduleId = Number(qs("m"));
+    const mod = MODULES.find(x => x.id === moduleId) || MODULES[0];
+    document.getElementById("title").textContent = mod.title;
+    document.getElementById("modulePill").textContent = `Module ${mod.id}`;
+
+    let player;
+    let duration = 0;
+    let maxWatched = 0;
+    let validPlaySeconds = 0;
+    let logged = false;
+
+    let progressTick = null;
+    let guardTick = null;
+
+    let lastWallTime = 0;
+    let lastPlayerTime = 0;
+    let suppressGuardUntil = 0;
+    let correctingSeek = false;
+
+    const SEEK_TOLERANCE_SECONDS = 0.75;
+    const MAX_INTERVAL_SECONDS = 1.25;
+    const ACTIVE_TIME_BUFFER_SECONDS = 10;
+    const GUARD_INTERVAL_MS = 150;
+
+    function clamp(n, min, max) {
+      return Math.min(Math.max(n, min), max);
+    }
+
+    function formatSeconds(sec) {
+      sec = Math.max(0, Math.floor(sec || 0));
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+
+      if (h > 0) {
+        return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      }
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    function pct() {
+      if (!duration) return 0;
+      return maxWatched / duration;
+    }
+
+    function requiredWatchPercent() {
+      return REQUIRED_WATCH_PERCENT || 0.9;
+    }
+
+    function requiredActiveSeconds() {
+      if (!duration) return 0;
+      const byPercent = duration * requiredWatchPercent();
+      const minusTen = Math.max(0, duration - ACTIVE_TIME_BUFFER_SECONDS);
+      return Math.min(byPercent, minusTen);
+    }
+
+    function completionReady() {
+      return pct() >= requiredWatchPercent() && validPlaySeconds >= requiredActiveSeconds();
+    }
+
+    function isVisibleForCredit() {
+      return document.visibilityState === "visible" && document.hasFocus();
+    }
+
+    function updateUI() {
+      const watchedPercent = Math.floor(pct() * 100);
+      const requiredPercent = Math.floor(requiredWatchPercent() * 100);
+      const activeRequired = requiredActiveSeconds();
+
+      document.getElementById("ruleText").textContent =
+        `${requiredPercent}% minimum viewing threshold + active viewing time`;
+
+      document.getElementById("progress").textContent =
+        `Progress: ${watchedPercent}% · Active time: ${formatSeconds(validPlaySeconds)} / ${formatSeconds(activeRequired)}`;
+
+      document.getElementById("progressFill").style.width = `${watchedPercent}%`;
+
+      if (logged) {
+        document.getElementById("statusText").textContent = "Complete";
+        return;
+      }
+
+      document.getElementById("statusText").textContent =
+        completionReady() ? "Eligible for Completion" : "In Progress";
+
+      if (!completionReady()) {
+        document.getElementById("done").innerHTML =
+          `Watch at least ${requiredPercent}% and keep the video actively playing for ${formatSeconds(activeRequired)}.`;
+      }
+    }
+
+    function completeModule() {
+      if (logged) return;
+      logged = true;
+
+      stopTimers();
+
+      document.getElementById("statusText").textContent = "Logging Completion";
+      document.getElementById("done").innerHTML = "<b>Module complete.</b> Logging to Google Sheets…";
+
+      apiLogModule(username, mod.id).then(res => {
+        if (!res.ok) {
+          logged = false;
+          startTimers();
+          document.getElementById("statusText").textContent = "Logging Error";
+          document.getElementById("done").innerHTML =
+            "<b>Error logging completion:</b> " + (res.error || "Unknown");
+          return;
+        }
+
+        document.getElementById("statusText").textContent = "Complete";
+        document.getElementById("done").innerHTML = "<b>Logged.</b> You can go back to Modules.";
+      }).catch(err => {
+        logged = false;
+        startTimers();
+        console.error(err);
+        document.getElementById("statusText").textContent = "Logging Error";
+        document.getElementById("done").innerHTML = "<b>Error logging completion.</b>";
+      });
+    }
+
+    function maybeComplete() {
+      if (!logged && completionReady()) {
+        completeModule();
+      }
+    }
+
+    function enforcePlaybackRate() {
+      try {
+        if (player && typeof player.getPlaybackRate === "function") {
+          if (player.getPlaybackRate() !== 1) {
+            player.setPlaybackRate(1);
+          }
+        }
+      } catch {}
+    }
+
+    function performSeekCorrection(targetTime) {
+      if (!player || correctingSeek) return;
+
+      correctingSeek = true;
+      suppressGuardUntil = Date.now() + 1200;
+
+      try { player.pauseVideo(); } catch {}
+
+      setTimeout(() => {
+        try {
+          player.seekTo(Math.max(0, targetTime), true);
+        } catch {}
+
+        setTimeout(() => {
+          try {
+            if (!logged) player.playVideo();
+          } catch {}
+          correctingSeek = false;
+        }, 180);
+      }, 60);
+    }
+
+    function detectAndCorrectSkip() {
+      if (!player || !duration || logged) return;
+      if (correctingSeek) return;
+      if (Date.now() < suppressGuardUntil) return;
+
+      let currentTime = 0;
+      let state = -1;
+
+      try {
+        currentTime = clamp(player.getCurrentTime() || 0, 0, duration);
+        state = player.getPlayerState();
+      } catch {
+        return;
+      }
+
+      if (
+        (state === YT.PlayerState.PLAYING ||
+         state === YT.PlayerState.PAUSED ||
+         state === YT.PlayerState.BUFFERING ||
+         state === YT.PlayerState.ENDED) &&
+        currentTime > maxWatched + SEEK_TOLERANCE_SECONDS
+      ) {
+        performSeekCorrection(maxWatched);
+        updateUI();
+      }
+    }
+
+    function progressLoop() {
+      if (!player || !duration || logged) return;
+
+      const now = Date.now();
+      let elapsed = (now - lastWallTime) / 1000;
+      lastWallTime = now;
+      elapsed = clamp(elapsed, 0, MAX_INTERVAL_SECONDS);
+
+      let state = -1;
+      let currentTime = 0;
+
+      try {
+        state = player.getPlayerState();
+        currentTime = clamp(player.getCurrentTime() || 0, 0, duration);
+      } catch {
+        return;
+      }
+
+      enforcePlaybackRate();
+
+      if (correctingSeek) {
+        lastPlayerTime = currentTime;
+        updateUI();
+        return;
+      }
+
+      if (currentTime > maxWatched + SEEK_TOLERANCE_SECONDS) {
+        performSeekCorrection(maxWatched);
+        updateUI();
+        return;
+      }
+
+      if (state === YT.PlayerState.PLAYING) {
+        if (currentTime > maxWatched) {
+          maxWatched = currentTime;
+        }
+
+        const forwardDelta = currentTime - lastPlayerTime;
+        const looksNatural = forwardDelta >= -0.25 && forwardDelta <= 1.5;
+
+        if (isVisibleForCredit() && looksNatural) {
+          validPlaySeconds = Math.min(duration, validPlaySeconds + elapsed);
+        }
+      }
+
+      if (state === YT.PlayerState.ENDED) {
+        if (currentTime >= duration - 1.5 && maxWatched < duration - 1.5) {
+          performSeekCorrection(maxWatched);
+          updateUI();
+          return;
+        }
+
+        maxWatched = Math.max(maxWatched, currentTime);
+      }
+
+      lastPlayerTime = currentTime;
+      updateUI();
+      maybeComplete();
+    }
+
+    function startTimers() {
+      stopTimers();
+      lastWallTime = Date.now();
+
+      progressTick = setInterval(progressLoop, 250);
+      guardTick = setInterval(detectAndCorrectSkip, GUARD_INTERVAL_MS);
+    }
+
+    function stopTimers() {
+      if (progressTick) clearInterval(progressTick);
+      if (guardTick) clearInterval(guardTick);
+      progressTick = null;
+      guardTick = null;
+    }
+
+    window.onYouTubeIframeAPIReady = function () {
+      player = new YT.Player("player", {
+        videoId: mod.youtubeId,
+        playerVars: {
+          controls: 1,
+          disablekb: 1,
+          fs: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1
+        },
+        events: {
+          onReady: () => {
+            duration = player.getDuration() || 0;
+            lastWallTime = Date.now();
+            lastPlayerTime = 0;
+
+            enforcePlaybackRate();
+            updateUI();
+            startTimers();
+          },
+
+          onStateChange: (e) => {
+            if (!player || !duration || logged) return;
+
+            let currentTime = 0;
+            try {
+              currentTime = clamp(player.getCurrentTime() || 0, 0, duration);
+            } catch {}
+
+            if (
+              !correctingSeek &&
+              currentTime > maxWatched + SEEK_TOLERANCE_SECONDS &&
+              (
+                e.data === YT.PlayerState.PLAYING ||
+                e.data === YT.PlayerState.PAUSED ||
+                e.data === YT.PlayerState.BUFFERING ||
+                e.data === YT.PlayerState.ENDED
+              )
+            ) {
+              performSeekCorrection(maxWatched);
+              updateUI();
+              return;
+            }
+
+            if (e.data === YT.PlayerState.ENDED) {
+              if (currentTime >= duration - 1.5) {
+                maxWatched = Math.max(maxWatched, currentTime);
+              }
+              updateUI();
+              maybeComplete();
+            }
+          },
+
+          onPlaybackRateChange: () => {
+            enforcePlaybackRate();
+          }
+        }
+      });
+    }
+
+    document.addEventListener("visibilitychange", updateUI);
+    window.addEventListener("focus", updateUI);
+    window.addEventListener("blur", updateUI);
+
+    window.addEventListener("beforeunload", () => {
+      stopTimers();
+    });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CDL Training Portal - Login</title>
+
+  <script src="config.js" defer></script>
+  <script src="frontend-api.js" defer></script>
+
+  <style>
+    :root{
+      --navy:#17324d;
+      --navy-dark:#10263a;
+      --green:#2f8f4e;
+      --bg:#eef2f6;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#5b6570;
+      --border:#d8e0e8;
+      --shadow:0 12px 32px rgba(16,38,58,.12);
+      --radius:18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: linear-gradient(180deg, #f5f7fa 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .topbar{
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+      border-bottom: 4px solid var(--green);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(0,0,0,.14);
+    }
+
+    .topbar-inner{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-width:0;
+    }
+
+    .brand-logo{
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .brand-fallback{
+      font-size: 28px;
+      font-weight: 800;
+      color:#fff;
+      line-height:1;
+    }
+
+    .brand-text h1{
+      margin:0;
+      font-size: clamp(1.35rem, 2vw, 2rem);
+      line-height:1.1;
+      letter-spacing:.02em;
+    }
+
+    .brand-text p{
+      margin:4px 0 0;
+      color: rgba(255,255,255,.86);
+      font-size: .98rem;
+      font-weight: 500;
+    }
+
+    .topbar-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      white-space:nowrap;
+      transition:background .15s ease, border-color .15s ease, transform .08s ease;
+    }
+
+    .topbar-link:hover{
+      background: rgba(255,255,255,.16);
+      border-color: rgba(255,255,255,.30);
+    }
+
+    .topbar-link:active{
+      transform:translateY(1px);
+    }
+
+    .page{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 38px 20px 48px;
+    }
+
+    .shell{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .login-card{
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(23,50,77,.06);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-card{
+      padding: 34px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height: 520px;
+      isolation:isolate;
+    }
+
+    .hero-card::after{
+      content:"";
+      position:absolute;
+      right:-90px;
+      bottom:-90px;
+      width: 420px;
+      height: 420px;
+      background: url("logo.png") no-repeat center/contain;
+      opacity:.05;
+      pointer-events:none;
+      z-index:-1;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      align-self:flex-start;
+      padding: 8px 12px;
+      border-radius:999px;
+      background:#e7eef5;
+      color:var(--navy);
+      font-size:.86rem;
+      font-weight:800;
+      margin-bottom:18px;
+    }
+
+    .hero-card h2{
+      margin:0 0 12px;
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      line-height: 1.02;
+      color: var(--navy-dark);
+    }
+
+    .accent{
+      width: 88px;
+      height: 4px;
+      border-radius:999px;
+      background: var(--green);
+      margin: 0 0 18px;
+    }
+
+    .hero-card p{
+      margin:0;
+      max-width: 570px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .hero-points{
+      margin-top: 24px;
+      display:grid;
+      gap:14px;
+    }
+
+    .hero-point{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      color: var(--text);
+      font-weight:600;
+    }
+
+    .dot{
+      width:11px;
+      height:11px;
+      margin-top:8px;
+      border-radius:999px;
+      background: var(--green);
+      flex:0 0 auto;
+      box-shadow: 0 0 0 6px rgba(47,143,78,.12);
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:28px;
+    }
+
+    .hero-btn,
+    .hero-btn-secondary{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:12px 18px;
+      border-radius:12px;
+      text-decoration:none;
+      font-weight:800;
+      transition:transform .08s ease, opacity .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    .hero-btn{
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+      color:#fff;
+      box-shadow:0 10px 20px rgba(16,38,58,.18);
+      border:0;
+    }
+
+    .hero-btn-secondary{
+      background:#fff;
+      color:var(--navy-dark);
+      border:1px solid var(--border);
+      box-shadow:0 8px 18px rgba(16,38,58,.08);
+    }
+
+    .hero-btn:hover,
+    .hero-btn-secondary:hover{
+      opacity:.97;
+    }
+
+    .hero-btn:active,
+    .hero-btn-secondary:active{
+      transform:translateY(1px);
+    }
+
+    .login-card{
+      padding: 30px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .login-card h3{
+      margin:0;
+      font-size:1.6rem;
+      color: var(--navy-dark);
+    }
+
+    .login-card .accent{
+      width:72px;
+      margin: 12px 0 18px;
+    }
+
+    .sub{
+      margin:0 0 20px;
+      color: var(--muted);
+      line-height:1.55;
+    }
+
+    .field{
+      display:grid;
+      gap:8px;
+      margin-bottom:16px;
+    }
+
+    .field label{
+      font-weight:800;
+      color: var(--navy-dark);
+      font-size:.95rem;
+    }
+
+    .field input{
+      width:100%;
+      border:1px solid var(--border);
+      background:#f9fbfc;
+      border-radius:12px;
+      padding:14px 15px;
+      font-size:16px;
+      outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .field input:focus{
+      border-color:#7aa5c9;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(23,50,77,.08);
+    }
+
+    #btn{
+      width:100%;
+      border:0;
+      border-radius:12px;
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+      color:#fff;
+      padding:14px 16px;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(16,38,58,.18);
+      transition:transform .08s ease, opacity .15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+
+    #btn:hover{ opacity:.97; }
+    #btn:active{ transform:translateY(1px); }
+
+    #btn:disabled{
+      cursor:wait;
+      opacity:.9;
+    }
+
+    .btn-spinner{
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,.35);
+      border-top-color:#fff;
+      display:none;
+      animation:spin .8s linear infinite;
+      flex:0 0 auto;
+    }
+
+    .public-note{
+      margin-top:16px;
+      padding:14px 15px;
+      border-radius:12px;
+      background:#f7fafc;
+      border:1px solid var(--border);
+      color:var(--muted);
+      line-height:1.55;
+      font-size:.95rem;
+    }
+
+    .public-note a{
+      color:var(--navy);
+      font-weight:800;
+      text-decoration:none;
+    }
+
+    .public-note a:hover{
+      text-decoration:underline;
+    }
+
+    .err{
+      min-height:22px;
+      margin-top:14px;
+      color:#b42318;
+      font-size:.95rem;
+      font-weight:700;
+    }
+
+    .footer{
+      max-width:1120px;
+      margin:0 auto;
+      padding: 0 20px 30px;
+      color: var(--muted);
+      font-size:.92rem;
+    }
+
+    .loading-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(16,38,58,.42);
+      backdrop-filter:blur(2px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:20px;
+    }
+
+    .loading-card{
+      width:min(92vw, 360px);
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 24px 60px rgba(16,38,58,.24);
+      padding:24px;
+      text-align:center;
+      border:1px solid rgba(23,50,77,.08);
+    }
+
+    .loading-spinner{
+      width:44px;
+      height:44px;
+      margin:0 auto 14px;
+      border-radius:999px;
+      border:4px solid rgba(23,50,77,.14);
+      border-top-color:var(--navy);
+      animation:spin .8s linear infinite;
+    }
+
+    .loading-title{
+      margin:0;
+      color:var(--navy-dark);
+      font-size:1.1rem;
+      font-weight:900;
+    }
+
+    .loading-sub{
+      margin:8px 0 0;
+      color:var(--muted);
+      line-height:1.5;
+      font-size:.95rem;
+    }
+
+    @keyframes spin{
+      to{ transform:rotate(360deg); }
+    }
+
+    @media (max-width: 900px){
+      .shell{
+        grid-template-columns: 1fr;
+      }
+      .hero-card{
+        min-height:auto;
+      }
+    }
+
+    @media (max-width: 560px){
+      .topbar-inner{
+        align-items:flex-start;
+      }
+      .topbar-left{
+        width:100%;
+      }
+      .brand-logo{
+        width:52px;
+        height:52px;
+      }
+      .hero-card,
+      .login-card{
+        padding:22px;
+      }
+      .topbar-link{
+        width:100%;
+      }
+      .hero-actions{
+        flex-direction:column;
+      }
+      .hero-btn,
+      .hero-btn-secondary{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <div class="brand-logo">
+          <img
+            src="logo.png"
+            alt="Martinsville CDL Program logo"
+            onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;brand-fallback&quot;>M</div>';">
+        </div>
+        <div class="brand-text">
+          <h1>CDL Training Portal</h1>
+          <p>ELDT Compliance Training</p>
+        </div>
+      </div>
+
+      <a class="topbar-link" href="resources.html">Public Resources</a>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="shell">
+      <section class="hero-card">
+        <span class="eyebrow">Official Training Portal</span>
+        <h2>Professional CDL training built for compliance.</h2>
+        <div class="accent"></div>
+        <p>
+          Access your assigned modules, track completion progress, and complete required
+          ELDT learning through the Martinsville CDL Program.
+        </p>
+
+        <div class="hero-points">
+          <div class="hero-point">
+            <span class="dot"></span>
+            <div>Secure student login and training access</div>
+          </div>
+          <div class="hero-point">
+            <span class="dot"></span>
+            <div>Progress tracking by module</div>
+          </div>
+          <div class="hero-point">
+            <span class="dot"></span>
+            <div>ELDT compliance training workflow</div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a class="hero-btn" href="resources.html">Open Public Resources</a>
+          <a class="hero-btn-secondary" href="#loginCard">Student Sign In</a>
+        </div>
+      </section>
+
+      <section class="login-card" id="loginCard">
+        <h3>Sign in</h3>
+        <div class="accent"></div>
+        <p class="sub">
+          Enter your assigned username and password to access your CDL training modules.
+        </p>
+
+        <div class="field">
+          <label for="u">Username</label>
+          <input id="u" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label for="p">Password</label>
+          <input id="p" type="password" autocomplete="current-password">
+        </div>
+
+        <button id="btn">
+          <span class="btn-spinner" id="btnSpinner"></span>
+          <span id="btnText">Sign In</span>
+        </button>
+        <div id="msg" class="err"></div>
+
+        <div class="public-note">
+          Need pre-trip materials before class?
+          <a href="resources.html">Open the public resources page</a>.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="footer">
+    CDL Training Portal · ELDT Compliance Training
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+    <div class="loading-card">
+      <div class="loading-spinner"></div>
+      <p class="loading-title">Signing you in…</p>
+      <p class="loading-sub">Loading your training dashboard.</p>
+    </div>
+  </div>
+
+  <script>
+    function setLoginLoading(isLoading) {
+      const btn = document.getElementById("btn");
+      const btnText = document.getElementById("btnText");
+      const btnSpinner = document.getElementById("btnSpinner");
+      const overlay = document.getElementById("loadingOverlay");
+      const u = document.getElementById("u");
+      const p = document.getElementById("p");
+
+      btn.disabled = isLoading;
+      u.disabled = isLoading;
+      p.disabled = isLoading;
+      btnSpinner.style.display = isLoading ? "inline-block" : "none";
+      btnText.textContent = isLoading ? "Signing In…" : "Sign In";
+      overlay.style.display = isLoading ? "flex" : "none";
+      overlay.setAttribute("aria-hidden", isLoading ? "false" : "true");
+    }
+
+    async function doLogin() {
+      const msg = document.getElementById("msg");
+      msg.textContent = "";
+
+      const u = document.getElementById("u").value.trim();
+      const p = document.getElementById("p").value;
+
+      if (!u || !p) {
+        msg.textContent = "Enter username and password.";
+        return;
+      }
+
+      if (typeof login !== "function") {
+        msg.textContent = "Login system not loaded.";
+        return;
+      }
+
+      setLoginLoading(true);
+
+      try {
+        const ok = await login(u, p);
+
+        if (!ok) {
+          setLoginLoading(false);
+          msg.textContent = "Invalid username or password.";
+          return;
+        }
+
+        location.href = "modules.html";
+      } catch (err) {
+        setLoginLoading(false);
+        msg.textContent = "Login error.";
+        console.error(err);
+      }
+    }
+
+    document.getElementById("btn").onclick = doLogin;
+    document.getElementById("u").addEventListener("keydown", function(e){
+      if (e.key === "Enter") doLogin();
+    });
+    document.getElementById("p").addEventListener("keydown", function(e){
+      if (e.key === "Enter") doLogin();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Training Admin</title>
+
+<script src="config.js" defer></script>
+<script src="frontend-api.js" defer></script>
+
+<style>
+body{
+  font-family: system-ui, Arial;
+  background:#f5f7fa;
+  padding:30px;
+  max-width:900px;
+  margin:auto;
+}
+
+h2{
+  margin-top:0;
+}
+
+.card{
+  background:white;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,.05);
+  margin-bottom:20px;
+}
+
+input{
+  padding:10px;
+  font-size:14px;
+  width:100%;
+  margin-bottom:10px;
+}
+
+button{
+  padding:10px 16px;
+  border:none;
+  border-radius:8px;
+  background:#2b7cff;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#1c63d5;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.table th,.table td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  text-align:left;
+}
+
+.actions button{
+  margin-right:6px;
+}
+
+.success{
+  color:green;
+}
+
+.error{
+  color:red;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="loginCard">
+
+<h2>Admin Login</h2>
+
+<input id="adminUser" placeholder="Admin username">
+<input id="adminPass" type="password" placeholder="Password">
+
+<button onclick="adminLogin()">Login</button>
+
+<div id="loginMsg"></div>
+
+</div>
+
+
+<div id="adminPanel" style="display:none">
+
+<div class="card">
+
+<h2>Student Management</h2>
+
+<input id="search" placeholder="Search students..." onkeyup="filterStudents()">
+
+<table class="table" id="studentTable">
+<thead>
+<tr>
+<th>Username</th>
+<th>Password</th>
+<th>Test Score</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="studentList"></tbody>
+
+</table>
+
+</div>
+
+
+<div class="card">
+
+<h2>Add Student</h2>
+
+<input id="newUser" placeholder="Username">
+<input id="newPass" placeholder="Password">
+
+<button onclick="addStudent()">Add Student</button>
+
+<div id="msg"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let students = []
+
+
+async function adminLogin(){
+
+const user = document.getElementById("adminUser").value
+const pass = document.getElementById("adminPass").value
+
+const res = await fetch(APP_SCRIPT_URL+"?action=adminLogin&username="+user+"&password="+pass)
+
+const data = await res.json()
+
+if(!data.ok){
+document.getElementById("loginMsg").innerHTML="<div class='error'>Login failed</div>"
+return
+}
+
+document.getElementById("loginCard").style.display="none"
+document.getElementById("adminPanel").style.display="block"
+
+loadStudents()
+
+}
+
+
+
+async function loadStudents(){
+
+const res = await fetch(APP_SCRIPT_URL+"?action=listStudents")
+
+const data = await res.json()
+
+students = data.students || []
+
+renderStudents()
+
+}
+
+
+
+function renderStudents(){
+
+const list = document.getElementById("studentList")
+
+list.innerHTML=""
+
+students.forEach(s=>{
+
+const row = document.createElement("tr")
+
+row.innerHTML=`
+<td>${s.username}</td>
+<td>${s.password}</td>
+<td>${s.testScore ?? ""}</td>
+<td class="actions">
+<button onclick="editStudent('${s.username}','${s.password}')">Edit</button>
+<button onclick="deleteStudent('${s.username}')">Delete</button>
+</td>
+`
+
+list.appendChild(row)
+
+})
+
+}
+
+
+
+function filterStudents(){
+
+const q = document.getElementById("search").value.toLowerCase()
+
+const rows = document.querySelectorAll("#studentList tr")
+
+rows.forEach(r=>{
+r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"
+})
+
+}
+
+
+
+async function addStudent(){
+
+const u = document.getElementById("newUser").value
+const p = document.getElementById("newPass").value
+
+const res = await fetch(APP_SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"addStudent",
+username:u,
+password:p
+})
+})
+
+const data = await res.json()
+
+if(!data.ok){
+document.getElementById("msg").innerHTML="<div class='error'>Failed</div>"
+return
+}
+
+document.getElementById("msg").innerHTML="<div class='success'>Student added</div>"
+
+loadStudents()
+
+}
+
+
+
+function editStudent(user,pass){
+
+const newUser = prompt("Username",user)
+const newPass = prompt("Password",pass)
+
+if(!newUser || !newPass) return
+
+fetch(APP_SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"updateStudent",
+username:user,
+newUsername:newUser,
+password:newPass
+})
+}).then(loadStudents)
+
+}
+
+
+
+function deleteStudent(user){
+
+if(!confirm("Delete "+user+" ?")) return
+
+fetch(APP_SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"deleteStudent",
+username:user
+})
+}).then(loadStudents)
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CDL Training - Test</title>
+  <script src="config.js" defer></script>
+  <script src="frontend-api.js" defer></script>
+  <style>
+    body { font-family: system-ui, Arial; padding: 24px; max-width: 820px; margin: 0 auto; }
+    button, input { padding: 12px; font-size: 16px; }
+    .small { color:#555; font-size: 13px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
+    .question { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #eee; }
+    .question:last-child { border-bottom: 0; }
+    .option { display:block; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <h2 id="testTitle">Test</h2>
+  <div class="small" id="who"></div>
+  <p class="small"><a href="modules.html">← Back to Modules</a></p>
+
+  <div id="lock" class="card">Checking if test is unlocked…</div>
+
+  <div id="test" class="card" style="display:none;">
+    <div class="small" style="margin-bottom:12px;">
+      25 questions · Multiple choice · Passing score: <b id="passScoreLabel">80%</b>
+    </div>
+
+    <form id="quizForm"></form>
+
+    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="submit" type="button">Submit</button>
+      <button id="retake" type="button">Retake</button>
+    </div>
+
+    <div id="result" style="margin-top:12px;"></div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const username = requireAuth();
+    document.getElementById("who").textContent = `Signed in as ${username}`;
+
+    const TEST_TITLE = "Defensive Driving / CMV Operations Comprehensive Test";
+    const PASSING_SCORE = 80;
+
+    const QUESTION_BANK = [
+      { question: "What is the purpose of ELDT?", options: ["Increase CDL costs", "Reduce crashes and standardize training", "Replace skills testing", "Eliminate permits"], correctIndex: 1 },
+      { question: "What must be completed before taking the CDL skills test?", options: ["Only driving hours", "Only classroom training", "ELDT theory and BTW training", "Medical exam only"], correctIndex: 2 },
+      { question: "What is the minimum passing score for ELDT theory testing?", options: ["70%", "75%", "80%", "85%"], correctIndex: 2 },
+      { question: "Normal air pressure range for air brake systems is:", options: ["50–75 PSI", "80–100 PSI", "100–125 PSI", "130–150 PSI"], correctIndex: 2 },
+      { question: "What should you do if engine temperature is too high?", options: ["Keep driving", "Increase speed", "Stop the vehicle", "Turn off lights"], correctIndex: 2 },
+      { question: "What is the purpose of a pre-trip inspection?", options: ["Save fuel", "Check route", "Ensure vehicle safety", "Clean the truck"], correctIndex: 2 },
+      { question: "When should a driver complete a pre-trip inspection?", options: ["Once a week", "Before every trip", "After fueling", "Only if problems occur"], correctIndex: 1 },
+      { question: "What does DVIR stand for?", options: ["Driver Vehicle Inspection Report", "Daily Vehicle Incident Record", "Driver Violation Information Report", "Department Vehicle Inspection Record"], correctIndex: 0 },
+      { question: "Following distance should increase based on:", options: ["Vehicle color", "Driver experience", "Vehicle weight and conditions", "Time of day only"], correctIndex: 2 },
+      { question: "Mirrors should be checked approximately every:", options: ["1–2 seconds", "5–8 seconds", "15–20 seconds", "30 seconds"], correctIndex: 1 },
+      { question: "Off-tracking refers to:", options: ["Losing control", "Trailer wheels following a tighter path", "Engine failure", "Tire wear"], correctIndex: 1 },
+      { question: "What is the purpose of engine braking?", options: ["Increase speed", "Reduce brake wear", "Improve fuel economy only", "Replace service brakes"], correctIndex: 1 },
+      { question: "Double clutching is used to:", options: ["Increase speed", "Match gear speeds", "Reduce fuel use", "Turn the vehicle"], correctIndex: 1 },
+      { question: "What does GOAL stand for?", options: ["Go Over And Leave", "Get Out And Look", "Get On And Load", "Go On And Learn"], correctIndex: 1 },
+      { question: "Which type of backing is most dangerous?", options: ["Straight", "Sight-side", "Blind-side", "Offset"], correctIndex: 2 },
+      { question: "What is the safest driving approach?", options: ["Aggressive driving", "Defensive driving", "Fast driving", "Minimal awareness"], correctIndex: 1 },
+      { question: "What is required after 8 hours of driving time?", options: ["Fuel stop", "30-minute break", "10-hour break", "Inspection"], correctIndex: 1 },
+      { question: "Maximum driving time allowed under HOS rules is:", options: ["10 hours", "11 hours", "12 hours", "14 hours"], correctIndex: 1 },
+      { question: "What should you do during a tire blowout?", options: ["Slam brakes", "Turn sharply", "Hold steering wheel and slow gradually", "Accelerate"], correctIndex: 2 },
+      { question: "What is the first priority after a crash?", options: ["Call employer", "Document damage", "Protect life and secure the scene", "Move vehicle immediately"], correctIndex: 2 },
+      { question: "Which of the following is part of a proper pre-trip inspection?", options: ["Checking radio stations", "Inspecting fluids, tires, and brakes", "Adjusting seat only", "Cleaning mirrors only"], correctIndex: 1 },
+      { question: "Which of the following is a common sign of driver fatigue?", options: ["Increased awareness", "Faster reaction time", "Yawning and drifting lanes", "Improved focus"], correctIndex: 2 },
+      { question: "Which document must a CDL driver carry at all times?", options: ["Birth certificate", "CDL license and medical card", "Social media account", "Insurance bill only"], correctIndex: 1 },
+      { question: "What is the correct action during brake failure?", options: ["Speed up", "Turn off engine immediately", "Downshift and use engine braking", "Jump out of the vehicle"], correctIndex: 2 },
+      { question: "When must cargo be inspected during a trip?", options: ["Only at the end of the trip", "Only if a problem occurs", "Before trip, within first 50 miles, and periodically", "Once per week"], correctIndex: 2 }
+    ];
+
+    function getRandomQuestions(bank, count) {
+      const shuffled = [...bank].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, count);
+    }
+
+    let QUESTIONS = getRandomQuestions(QUESTION_BANK, 25);
+
+    const lock = document.getElementById("lock");
+    const test = document.getElementById("test");
+    const result = document.getElementById("result");
+    const quizForm = document.getElementById("quizForm");
+    const submitBtn = document.getElementById("submit");
+    const retakeBtn = document.getElementById("retake");
+
+    document.getElementById("testTitle").textContent = TEST_TITLE;
+
+    function renderQuestions() {
+      quizForm.innerHTML = "";
+
+      QUESTIONS.forEach((q, qIndex) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "question";
+
+        const prompt = document.createElement("p");
+        prompt.innerHTML = `<b>Question ${qIndex + 1}:</b> ${q.question}`;
+        wrapper.appendChild(prompt);
+
+        q.options.forEach((opt, optIndex) => {
+          const label = document.createElement("label");
+          label.className = "option";
+          label.innerHTML = `
+            <input type="radio" name="q${qIndex}" value="${optIndex}">
+            ${opt}
+          `;
+          wrapper.appendChild(label);
+        });
+
+        quizForm.appendChild(wrapper);
+      });
+    }
+
+    function getSelections() {
+      return QUESTIONS.map((_, i) => {
+        const selected = quizForm.querySelector(`input[name="q${i}"]:checked`);
+        return selected ? Number(selected.value) : null;
+      });
+    }
+
+    (async () => {
+      const status = await apiGetStatus(username);
+      if (!status.ok) {
+        lock.textContent = "Error: " + (status.error || "Unknown");
+        return;
+      }
+      if (!allModulesComplete(status)) {
+        lock.innerHTML = "<b>Locked.</b> Finish all modules first.";
+        return;
+      }
+
+      renderQuestions();
+      lock.style.display = "none";
+      test.style.display = "block";
+    })();
+
+    submitBtn.onclick = async () => {
+      const selected = getSelections();
+      const unanswered = selected.filter(v => v === null).length;
+
+      if (unanswered > 0) {
+        result.innerHTML = `<b>Please answer all questions.</b> ${unanswered} unanswered.`;
+        return;
+      }
+
+      let correct = 0;
+      QUESTIONS.forEach((q, i) => {
+        if (selected[i] === q.correctIndex) correct += 1;
+      });
+
+      const score = Math.round((correct / QUESTIONS.length) * 100);
+      const passed = score >= PASSING_SCORE;
+
+      result.innerHTML = "Logging score to Google Sheets…";
+
+      const res = await apiLogTest(username, passed, score);
+
+      if (!res.ok) {
+        result.innerHTML = "<b>Error logging:</b> " + (res.error || "Unknown");
+        return;
+      }
+
+      result.innerHTML = `<b>${passed ? "Passed" : "Did not pass"}.</b> Score: ${score}% (${correct}/${QUESTIONS.length}).`;
+    };
+
+    retakeBtn.onclick = () => {
+      QUESTIONS = getRandomQuestions(QUESTION_BANK, 25);
+      renderQuestions();
+      quizForm.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.checked = false;
+      });
+      result.textContent = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    });
+  </script>
+</body>
+</html>
