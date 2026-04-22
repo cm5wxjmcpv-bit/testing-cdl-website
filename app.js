@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = "1bf3KX4t0xdduF_l8yCnMhOrlixK5hEmcp_br2U91Y30";
+const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZu6Ixhc1cl4pGuVDDHQsGYofZRyo5PopbSSnsnJh8RaMANTs8cs25TiACSYI7GC3lpQ/exec";
 const STATUS_SHEET = "Status";
 const STUDENTS_SHEET = "Students";
 const ADMINS_SHEET = "Admins";
